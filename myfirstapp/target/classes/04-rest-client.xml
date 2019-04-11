@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+    <http:request-config name="HTTP_Request_Configuration" host="localhost" port="8082" basePath="rest" doc:name="HTTP Request Configuration"/>
+    <flow name="04-rest-clientFlowMethod1">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/products1" doc:name="HTTP"/>
+        <http:request config-ref="HTTP_Request_Configuration" path="/products/#[message.inboundProperties.'http.query.params'.productname]" method="GET" doc:name="HTTP"/>
+    </flow>
+    <flow name="04-rest-clientFlowMethod2">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/products2" doc:name="HTTP"/>
+        <set-variable variableName="pName" value="#[message.inboundProperties.'http.query.params'.productname]" doc:name="Variable"/>
+        <http:request config-ref="HTTP_Request_Configuration" path="/products/#[flowVars.pName]" method="GET" doc:name="HTTP"/>
+    </flow>
+    <flow name="04-rest-clientMethod3">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/products3" doc:name="HTTP"/>
+        <set-variable variableName="pName" value="#[message.inboundProperties.'http.query.params'.productname]" doc:name="Variable"/>
+        <http:request config-ref="HTTP_Request_Configuration" path="/products/{productName}" method="GET" doc:name="HTTP">
+            <http:request-builder>
+                <http:uri-param paramName="productName" value="#[flowVars.pName]"/>
+            </http:request-builder>
+        </http:request>
+    </flow>
+</mule>
