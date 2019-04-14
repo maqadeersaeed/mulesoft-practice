@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ws="http://www.mulesoft.org/schema/mule/ws" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+    <ws:consumer-config name="Web_Service_Consumer1" wsdlLocation="http://localhost:6060/soap/ws/products.wsdl" service="ProductServicePortService" port="ProductServicePortSoap11" serviceAddress="http://localhost:6060/soap/ws" doc:name="Web Service Consumer"/>
+    <flow name="allProductsFlow">
+        <ws:consumer config-ref="Web_Service_Consumer1" operation="getAllProducts" doc:name="Web Service Consumer"/>
+    </flow>
+    <flow name="productByNameFlow">
+        <logger message="PARAM VALUE : #[message.inboundProperties.'http.query.params'.pname]" level="INFO" doc:name="Logger"/>
+        <parse-template location="getproductsbyname.xml" doc:name="Parse Template"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <ws:consumer config-ref="Web_Service_Consumer1" operation="getProductsByName" doc:name="Web Service Consumer"/>
+    </flow>
+    <flow name="06-soap-clientFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/sproducts" doc:name="HTTP"/>
+        <logger message="&gt;&gt; Starting Operation" level="INFO" doc:name="Logger"/>
+        <choice doc:name="Choice">
+            <when expression="#[message.inboundProperties.'http.query.params'.pname == empty]">
+                <logger message="All Products" level="INFO" doc:name="AllProducts Logger"/>
+                <flow-ref name="allProductsFlow" doc:name="AllProducts"/>
+            </when>
+            <when expression="#[message.inboundProperties.'http.query.params'.pname != empty]">
+                <logger message="Products By Name" level="INFO" doc:name="By Name Product Logger"/>
+                <flow-ref name="productByNameFlow" doc:name="Products By Name"/>
+            </when>
+            <otherwise>
+                <logger message="Invalid Request" level="INFO" doc:name="Logger"/>
+            </otherwise>
+        </choice>
+    </flow>
+</mule>
