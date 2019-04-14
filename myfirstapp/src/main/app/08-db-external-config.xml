@@ -10,15 +10,6 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-current.xsd
 http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
     
-    <context:property-placeholder location="classpath:db-config-${myenv}.properties"/>
-    
-    <db:mysql-config name="MySQL_Configuration2" 
-    					host="${db.host}" 
-    					port="${db.port}" 
-    					user="${db.user}" 
-    					password="${db.password}" 
-    					database="${db.database}" doc:name="MySQL Configuration"/>
-    
     <flow name="08-db-external-configFlow">
         
         <http:listener config-ref="HTTP_Listener_Configuration" path="/products-dbe" doc:name="HTTP"/>
