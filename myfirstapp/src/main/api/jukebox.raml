@@ -1,0 +1,38 @@
+#%RAML 0.8
+title: My Songs API
+baseUri: http://locahost:8081/api
+
+/songs: 
+  get: 
+    queryParameters: 
+      offset:
+        type: integer
+        description: Offset i the collection songs
+        default: 0
+        required: false
+      length:
+        type: integer
+        description: Length 
+        default: 10
+        required: false
+    responses: 
+      200:
+        body:
+          application/json: 
+            example: !include jukebox-include-songs.sample
+      404:
+        body:
+          application/json: 
+            example: | 
+                    {"data":"Not Found"}
+      
+  post: 
+
+/albums: 
+  get: 
+  post: 
+
+/artists: 
+  get: 
+  post: 
+  put: 
